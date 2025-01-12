@@ -1,61 +1,116 @@
-<a href="https://chat.vercel.ai/">
-  <img alt="Next.js 14 and App Router-ready AI chatbot." src="app/(chat)/opengraph-image.png">
-  <h1 align="center">Next.js AI Chatbot</h1>
-</a>
+# Nurse Joy 🏥
 
-<p align="center">
-  An Open-Source AI Chatbot Template Built With Next.js and the AI SDK by Vercel.
-</p>
+An AI-powered medical assistant designed to streamline the radiology scan preparation process. Built with Next.js and inspired by Vercel's AI chatbot template.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#model-providers"><strong>Model Providers</strong></a> ·
-  <a href="#deploy-your-own"><strong>Deploy Your Own</strong></a> ·
-  <a href="#running-locally"><strong>Running locally</strong></a>
-</p>
-<br/>
+## Overview
+
+Nurse Joy is an intelligent conversational agent that interviews patients before their radiology scans. It gathers relevant medical history, current symptoms, and other critical information to help radiology technicians make informed decisions about contrast medium administration.
 
 ## Features
 
-- [Next.js](https://nextjs.org) App Router
-  - Advanced routing for seamless navigation and performance
-  - React Server Components (RSCs) and Server Actions for server-side rendering and increased performance
-- [AI SDK](https://sdk.vercel.ai/docs)
-  - Unified API for generating text, structured objects, and tool calls with LLMs
-  - Hooks for building dynamic chat and generative user interfaces
-  - Supports OpenAI (default), Anthropic, Cohere, and other model providers
-- [shadcn/ui](https://ui.shadcn.com)
-  - Styling with [Tailwind CSS](https://tailwindcss.com)
-  - Component primitives from [Radix UI](https://radix-ui.com) for accessibility and flexibility
-- Data Persistence
-  - [Vercel Postgres powered by Neon](https://vercel.com/storage/postgres) for saving chat history and user data
-  - [Vercel Blob](https://vercel.com/storage/blob) for efficient file storage
-- [NextAuth.js](https://github.com/nextauthjs/next-auth)
-  - Simple and secure authentication
+- **Natural Conversational Interface**: Engages patients in a friendly, professional dialogue to collect medical information
+- **Structured Data Collection**: Systematically gathers:
+  - Current medications
+  - Allergies and previous reactions
+  - Kidney function history
+  - Previous contrast medium exposure
+  - Pregnancy status (if applicable)
+  - Current symptoms
+- **Intelligent Analysis**: Processes patient responses to identify potential contraindications
+- **Clear Reporting**: Generates concise summaries for radiology technicians
+- **Privacy-First Design**: Built with HIPAA compliance considerations
+- **Mobile-Responsive Interface**: Accessible on any device
 
-## Model Providers
+## Tech Stack
 
-This template ships with OpenAI `gpt-4o` as the default. However, with the [AI SDK](https://sdk.vercel.ai/docs), you can switch LLM providers to [OpenAI](https://openai.com), [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), and [many more](https://sdk.vercel.ai/providers/ai-sdk-providers) with just a few lines of code.
+- Next.js 14 (App Router)
+- TypeScript
+- OpenAI API / Anthropic API
+- Tailwind CSS
+- Vercel AI SDK
+- shadcn/ui Components
 
-## Deploy Your Own
+## Getting Started
 
-You can deploy your own version of the Next.js AI Chatbot to Vercel with one click:
+### Prerequisites
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fai-chatbot&env=AUTH_SECRET,OPENAI_API_KEY&envDescription=Learn%20more%20about%20how%20to%20get%20the%20API%20Keys%20for%20the%20application&envLink=https%3A%2F%2Fgithub.com%2Fvercel%2Fai-chatbot%2Fblob%2Fmain%2F.env.example&demo-title=AI%20Chatbot&demo-description=An%20Open-Source%20AI%20Chatbot%20Template%20Built%20With%20Next.js%20and%20the%20AI%20SDK%20by%20Vercel.&demo-url=https%3A%2F%2Fchat.vercel.ai&stores=[{%22type%22:%22postgres%22},{%22type%22:%22blob%22}])
+- Node.js 18+
+- npm or yarn
+- OpenAI API key or Anthropic API key
 
-## Running locally
-
-You will need to use the environment variables [defined in `.env.example`](.env.example) to run Next.js AI Chatbot. It's recommended you use [Vercel Environment Variables](https://vercel.com/docs/projects/environment-variables) for this, but a `.env` file is all that is necessary.
-
-> Note: You should not commit your `.env` file or it will expose secrets that will allow others to control access to your various OpenAI and authentication provider accounts.
-
-1. Install Vercel CLI: `npm i -g vercel`
-2. Link local instance with Vercel and GitHub accounts (creates `.vercel` directory): `vercel link`
-3. Download your environment variables: `vercel env pull`
+### Installation
 
 ```bash
-pnpm install
-pnpm dev
+# Clone the repository
+git clone https://github.com/yourusername/nurse_joy.git
+
+# Navigate to project directory
+cd nurse_joy
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env.local
 ```
 
-Your app template should now be running on [localhost:3000](http://localhost:3000/).
+### Environment Variables
+
+Add the following to your `.env.local`:
+
+```
+OPENAI_API_KEY=your_api_key_here
+# or
+ANTHROPIC_API_KEY=your_api_key_here
+
+# Optional: Database URL if using persistent storage
+DATABASE_URL=your_database_url
+```
+
+### Running the Development Server
+
+```bash
+npm run dev
+```
+
+Visit `http://localhost:3000` to see the application.
+
+## Usage
+
+1. Patient starts a new session
+2. Nurse Joy introduces itself and begins gathering information
+3. Through natural conversation, all necessary medical data is collected
+4. A summary is generated for the radiology technician
+5. Technician reviews the information to make an informed decision about contrast medium use
+
+## Contributing
+
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+### Development Guidelines
+
+- Follow TypeScript best practices
+- Write tests for new features
+- Maintain HIPAA compliance standards
+- Document all new features and API changes
+
+## Security & Privacy
+
+- All patient data is handled according to HIPAA guidelines
+- Data is not stored permanently unless explicitly configured
+- Conversations are encrypted end-to-end
+- Regular security audits are performed
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Built on [Vercel's AI Chatbot](https://github.com/vercel/ai-chatbot) template
+- Uses components from [shadcn/ui](https://ui.shadcn.com/)
+- Inspired by the healthcare professionals who work tirelessly to provide quality patient care
+
+## Support
+
+For support, please open an issue in the GitHub repository or contact the maintainers at [support@nursejoy.com](mailto:support@nursejoy.com).
