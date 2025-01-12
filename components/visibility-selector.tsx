@@ -32,12 +32,12 @@ const visibilities: Array<{
     description: 'Only you can access this chat',
     icon: <LockIcon />,
   },
-  {
-    id: 'public',
-    label: 'Public',
-    description: 'Anyone with the link can access this chat',
-    icon: <GlobeIcon />,
-  },
+  // {
+  //   id: 'public',
+  //   label: 'Public',
+  //   description: 'Anyone with the link can access this chat',
+  //   icon: <GlobeIcon />,
+  // },
 ];
 
 export function VisibilitySelector({
