@@ -20,33 +20,26 @@ export function useChatVisibility({
     `${chatId}-visibility`,
     null,
     {
-      fallbackData: initialVisibility,
+      fallbackData: 'private',
     },
   );
 
   const visibilityType = useMemo(() => {
-    if (!history) return localVisibility;
-    const chat = history.find((chat) => chat.id === chatId);
-    if (!chat) return 'private';
-    return chat.visibility;
-  }, [history, chatId, localVisibility]);
+    return 'private';
+  }, []);
 
   const setVisibilityType = (updatedVisibilityType: VisibilityType) => {
-    setLocalVisibility(updatedVisibilityType);
+    const forcedPrivate: VisibilityType = 'private';
+    setLocalVisibility(forcedPrivate);
 
     mutate<Array<Chat>>(
       '/api/history',
       (history) => {
         return history
-          ? history.map((chat) => {
-              if (chat.id === chatId) {
-                return {
-                  ...chat,
-                  visibility: updatedVisibilityType,
-                };
-              }
-              return chat;
-            })
+          ? history.map((chat) => ({
+              ...chat,
+              visibility: 'private',
+            }))
           : [];
       },
       { revalidate: false },
@@ -54,7 +47,7 @@ export function useChatVisibility({
 
     updateChatVisibility({
       chatId: chatId,
-      visibility: updatedVisibilityType,
+      visibility: 'private',
     });
   };
 
