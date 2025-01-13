@@ -15,6 +15,7 @@ import {
   useEffect,
   useRef,
   useState,
+  RefObject,
 } from 'react';
 import { useOnClickOutside } from 'usehooks-ts';
 import { nanoid } from 'nanoid';
@@ -29,15 +30,13 @@ import { sanitizeUIMessages } from '@/lib/utils';
 import {
   ArrowUpIcon,
   CodeIcon,
-  FileIcon,
   LogsIcon,
   MessageIcon,
   PenIcon,
   StopIcon,
   SummarizeIcon,
-  TerminalIcon,
 } from './icons';
-import { BlockKind } from './block';
+import type { BlockKind } from './block';
 
 type ToolProps = {
   type:
@@ -48,7 +47,7 @@ type ToolProps = {
     | 'add-comments'
     | 'add-logs';
   description: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
   selectedTool: string | null;
   setSelectedTool: Dispatch<SetStateAction<string | null>>;
   isToolbarVisible?: boolean;
@@ -295,7 +294,7 @@ const toolsByBlockKind: Record<
       | 'add-comments'
       | 'add-logs';
     description: string;
-    icon: JSX.Element;
+    icon: React.ReactNode;
   }>
 > = {
   text: [
@@ -410,12 +409,12 @@ const PureToolbar = ({
   blockKind: 'text' | 'code';
 }) => {
   const toolbarRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  useOnClickOutside(toolbarRef, () => {
+  useOnClickOutside(toolbarRef as RefObject<HTMLElement>, () => {
     setIsToolbarVisible(false);
     setSelectedTool(null);
   });
