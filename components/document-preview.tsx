@@ -2,16 +2,17 @@
 
 import {
   memo,
-  MouseEvent,
+  type MouseEvent,
   useCallback,
   useEffect,
   useMemo,
   useRef,
+  MutableRefObject,
 } from 'react';
-import { UIBlock } from './block';
+import type { UIBlock } from './block';
 import { FileIcon, FullscreenIcon, LoaderIcon } from './icons';
 import { cn, fetcher } from '@/lib/utils';
-import { Document } from '@/lib/db/schema';
+import type { Document } from '@/lib/db/schema';
 import { InlineDocumentSkeleton } from './document-skeleton';
 import useSWR from 'swr';
 import { Editor } from './editor';
@@ -24,6 +25,12 @@ interface DocumentPreviewProps {
   isReadonly: boolean;
   result?: any;
   args?: any;
+}
+
+interface HitboxLayerProps {
+  hitboxRef: MutableRefObject<HTMLDivElement | null>;
+  result: any;
+  setBlock: (updaterFn: UIBlock | ((currentBlock: UIBlock) => UIBlock)) => void;
 }
 
 export function DocumentPreview({
@@ -131,11 +138,7 @@ const PureHitboxLayer = ({
   hitboxRef,
   result,
   setBlock,
-}: {
-  hitboxRef: React.RefObject<HTMLDivElement>;
-  result: any;
-  setBlock: (updaterFn: UIBlock | ((currentBlock: UIBlock) => UIBlock)) => void;
-}) => {
+}: HitboxLayerProps) => {
   const handleClick = useCallback(
     (event: MouseEvent<HTMLElement>) => {
       const boundingBox = event.currentTarget.getBoundingClientRect();

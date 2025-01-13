@@ -3,8 +3,8 @@
 import type { ChatRequestOptions, Message } from 'ai';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useMemo, useState } from 'react';
-
+import { memo, useState } from 'react';
+import Image from 'next/image'
 import type { Vote } from '@/lib/db/schema';
 
 import { DocumentToolCall, DocumentToolResult } from './document';
@@ -63,7 +63,14 @@ const PurePreviewMessage = ({
           {message.role === 'assistant' && (
             <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
               <div className="translate-y-px">
-                <SparklesIcon size={14} />
+                {/* <SparklesIcon size={14} /> */}
+                <Image
+                  src="/images/nurse_joy.jpg"  // Add your nurse image to public/images/
+                  alt="Nurse Joy"
+                  width={24}
+                  height={24}
+                  className="rounded-full"
+                />
               </div>
             </div>
           )}

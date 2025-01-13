@@ -12,7 +12,6 @@ import { customModel } from '@/lib/ai';
 import { models } from '@/lib/ai/models';
 import {
   codePrompt,
-  systemPrompt,
   updateDocumentPrompt,
 } from '@/lib/ai/prompts';
 import {

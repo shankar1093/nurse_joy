@@ -2,7 +2,7 @@
 
 import type { Attachment, Message } from 'ai';
 import { useChat } from 'ai/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 
 import { ChatHeader } from '@/components/chat-header';
@@ -12,7 +12,7 @@ import { fetcher } from '@/lib/utils';
 import { Block } from './block';
 import { MultimodalInput } from './multimodal-input';
 import { Messages } from './messages';
-import { VisibilityType } from './visibility-selector';
+import type { VisibilityType } from './visibility-selector';
 import { useBlockSelector } from '@/hooks/use-block';
 
 export function Chat({
@@ -49,6 +49,16 @@ export function Chat({
       mutate('/api/history');
     },
   });
+
+  useEffect(() => {
+    if (messages.length === 0 ) {
+      append({
+        role: 'assistant',
+        content: "Hello! I'm Nurse Joy, and I'm here to help you complete a safety screening form for your upcoming imaging procedure with contrast dye. Your answers will help ensure your safety and guide our medical team. This will only take a few minutes, and your responses will remain confidential. Could you please start by telling me your name?",
+        id: 'initial-message',
+      });
+    }
+  }, [])
 
   const { data: votes } = useSWR<Array<Vote>>(
     `/api/vote?chatId=${id}`,
