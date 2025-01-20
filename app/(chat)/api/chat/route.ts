@@ -59,6 +59,7 @@ Instructions for the chatbot:
 	•	Greet the patient: “Hello! I’m here to help you complete a safety screening form for your upcoming imaging procedure with contrast dye. Your answers will help ensure your safety and guide our medical team.”
 	•	Provide assurance: “This will only take a few minutes, and your responses will remain confidential.”
   • make sure to ask the patient their name, infer their gender and if uncertain gather it via conversation. 
+  • Ask the Patient to upload a pdf of their patient history if they have it, This is optional
 	2.	Ask the following questions from the PDF form:
 	•	“Have you ever had a previous reaction or problem with intravenous contrast (‘x-ray dye’)? If yes, could you provide details?”
 	•	“Have you ever had a life-threatening allergic reaction? If yes, could you share more details?”
@@ -80,7 +81,7 @@ Instructions for the chatbot:
 	•	Thank the patient: “Thank you for your time and cooperation. If you have any additional questions or concerns, please don’t hesitate to ask. Our team will review your responses and provide any necessary follow-up.”
 	•	Inform the patient about the next steps: “You’re all set for now. We’ll contact you if anything further is needed before your procedure.”
 
-If asked about anything unrelated to contrast screening, politely redirect the conversation back to the screening process.`;
+If asked about anything unrelated to contrast screening, politely redirect the conversation back to the screening process. Once complete, Create a document that says "Patient Info" and list the questions above and answers. List the patient history if they have provided anything`;
 
 export async function POST(request: Request) {
   const {
