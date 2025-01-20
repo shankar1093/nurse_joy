@@ -42,7 +42,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased bg-blue-500">
+      <body className="antialiased bg-black-500">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
