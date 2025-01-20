@@ -210,6 +210,30 @@ export async function getDocumentsById({ id }: { id: string }) {
   }
 }
 
+export async function getConversationByUserId({ id }: {id: string}) {
+  try { 
+    const convo = await db
+    .select({
+      messageId: message.id,
+      messageContent: message.content,
+      chatId: chat.id,
+      chatCreatedAt: chat.createdAt,
+      userId: user.id,
+    })
+    .from(message)
+    .innerJoin(chat, eq(message.chatId, chat.id))
+    .innerJoin(user, eq(chat.userId, user.id))
+    .where(eq(user.id,id))
+    .orderBy(desc(chat.createdAt), asc(message.createdAt))
+    return convo;
+  } catch (error) {
+    console.error('Failed to get conversation for User ID')
+    throw error;
+  }
+
+}
+
+
 export async function getDocumentById({ id }: { id: string }) {
   try {
     const [selectedDocument] = await db
