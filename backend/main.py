@@ -36,8 +36,8 @@ def send_email(recipient: str, pdf_path: str):
 
     smtp_server = 'smtp.mailgun.org'
     smtp_port = 587  # Port for TLS
-    username = 'postmaster@sandboxb09071bdece741eb86ee49fa290b7f3d.mailgun.org'
-    password = '869bc7fc666fb91d8ce2fe9f34347788-667818f5-80cece61'
+    smtp_username = os.environ.get("MAILGUN_USERNAME")
+    smtp_password = os.environ.get("MAILGUN_PASSWORD")
 
     # Send the email
     try:
