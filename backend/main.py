@@ -7,6 +7,9 @@ import smtplib
 from email.message import EmailMessage
 import requests
 from datetime import datetime
+import os
+
+import uvicorn
 
 app = FastAPI()
 
@@ -127,3 +130,11 @@ async def get_status():
         "timestamp": datetime.utcnow().isoformat() + "Z",  # Current UTC time in ISO format
         "active_users": 0  # Placeholder for active users, update as needed
     }
+
+@app.get("/")
+async def read_root():
+    return {"message": "Hello World!"}
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 4000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
