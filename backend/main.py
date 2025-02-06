@@ -116,3 +116,8 @@ async def submit_form(data:FormData):
     # Fill the answers
     fill_answers(pdf_path, output_path, answers)
     send_email('shankar1093@gmail.com', output_path)
+
+
+@app.get("/status/")
+async def submit_form(data:FormData):
+    return {"status": "healthy", "message": "All systems are operational."}
