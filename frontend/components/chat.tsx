@@ -57,7 +57,6 @@ export function Chat({
         content: "Hello! I'm Nurse Joy, and I'm here to help you complete a safety screening form for your upcoming imaging procedure with contrast dye. Your answers will help ensure your safety and guide our medical team. This will only take a few minutes, and your responses will remain confidential. Could you please start by telling me your name?",
         id: 'initial-message',
       });
-      updatePDFForm();
     }
   }, [])
 
