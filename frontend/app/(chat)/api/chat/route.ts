@@ -188,6 +188,8 @@ export async function POST(request: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
+  const email = session.user.email
+
   const model = models.find((model) => model.id === modelId);
 
   if (!model) {
@@ -598,7 +600,9 @@ export async function POST(request: Request) {
                     }
                   }
                   const answers: string[] = JSON.parse(answersString.trim());
-                  await updatePDFForm(answers);
+                  if (email === "shankar1093@gmail.com" || email === "anthony.upton@gmail.com") {
+                    await updatePDFForm(answers);
+                  }
                 } catch (error) {
                   console.error("Failed to process document:", error);
                 }

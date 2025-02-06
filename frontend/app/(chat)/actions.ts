@@ -53,7 +53,7 @@ export async function deleteTrailingMessages({ id }: { id: string }) {
 
 export async function updatePDFForm(formAnswers: string[]) {
   try {
-    const response = await fetch("http://127.0.0.1:8000/update_pdf/", {
+    const response = await fetch("https://nurse-joy-backend.onrender.com/update_pdf/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

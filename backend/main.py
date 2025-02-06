@@ -120,6 +120,18 @@ async def submit_form(data:FormData):
     # Fill the answers
     fill_answers(pdf_path, output_path, answers)
     send_email('shankar1093@gmail.com', output_path)
+    send_email('anthony.upton@gmail.com', output_path)
+    try:
+        if os.path.exists(output_path):
+            os.remove(output_path)
+            print(f"Deleted file: {output_path}")
+        else:
+            print(f"File not found: {output_path}")
+    except Exception as e:
+        print(f"Error deleting file: {e}")
+
+    return {"message": "PDF updated, emails sent, and file deleted."}
+
 
 
 @app.get("/status/")
