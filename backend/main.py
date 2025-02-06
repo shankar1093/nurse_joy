@@ -8,14 +8,12 @@ from email.message import EmailMessage
 import requests
 from datetime import datetime
 import os
-
 import uvicorn
 
 app = FastAPI()
 
 class FormData(BaseModel):
-    answers:List[str]
-
+    answers: List[str]
 
 def send_email(recipient: str, pdf_path: str):
     msg = EmailMessage()
@@ -24,27 +22,25 @@ def send_email(recipient: str, pdf_path: str):
     msg['To'] = recipient
     msg.set_content('Hello,\n\nPlease find the attached PDF document.\n\nBest regards,\nYour Name')
 
-    pdf_filename = pdf_path
-
-    with open(pdf_filename, 'rb') as f:
+    with open(pdf_path, 'rb') as f:
         pdf_data = f.read()
-        # Attach the PDF with appropriate MIME types
-        msg.add_attachment(pdf_data,
-                           maintype='application',
-                           subtype='pdf',
-                           filename=pdf_filename.split('/')[-1])  # Use just the filename
+        msg.add_attachment(
+            pdf_data,
+            maintype='application',
+            subtype='pdf',
+            filename=os.path.basename(pdf_path)
+        )
 
     smtp_server = 'smtp.mailgun.org'
     smtp_port = 587  # Port for TLS
     smtp_username = os.environ.get("MAILGUN_USERNAME")
     smtp_password = os.environ.get("MAILGUN_PASSWORD")
 
-    # Send the email
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()  # Upgrade the connection to a secure encrypted SSL/TLS connection
-            server.login(smtp_username, smtp_password)  # Log in to the SMTP server
-            server.send_message(msg)  # Send the email
+            server.starttls()
+            server.login(smtp_username, smtp_password)
+            server.send_message(msg)
             print("Email sent successfully!")
     except Exception as e:
         print(f"Failed to send email: {e}")
@@ -55,23 +51,14 @@ def find_answer_fields(pdf_path):
     
     for page_num in range(len(doc)):
         page = doc[page_num]
-        
-        # Search for the word "answer" (case insensitive)
-        # Using only TEXT_DEHYPHENATE flag
         text_instances = page.search_for("answer", flags=fitz.TEXT_DEHYPHENATE)
-        
         for rect in text_instances:
-            # Get coordinates of the marker word "answer"
             x0, y0, x1, y1 = rect
-            
-            # Calculate insertion point (20 points to the right of "answer")
-            # Keeping the same y-coordinate for alignment
             insert_point = {
                 'page': page_num,
-                'coordinates': (x1 + 20, y0),  # 20 points right of the word
-                'line_end': (page.rect.width - 20, y0)  # End of line (with margin)
+                'coordinates': (x1 + 20, y0),
+                'line_end': (page.rect.width - 20, y0)
             }
-            
             answer_coordinates.append(insert_point)
     
     doc.close()
@@ -79,22 +66,14 @@ def find_answer_fields(pdf_path):
 
 def fill_answers(pdf_path, output_path, answers):
     doc = fitz.open(pdf_path)
-    
-    # Get coordinates for all answer fields
     field_positions = find_answer_fields(pdf_path)
     
-    # Make sure we have enough answers for all fields
     if len(answers) < len(field_positions):
         print(f"Warning: Only {len(answers)} answers provided for {len(field_positions)} fields")
     
-    # Insert each answer
     for answer, field in zip(answers, field_positions):
         page = doc[field['page']]
-        
-        # Calculate text placement
         x, y = field['coordinates']
-        
-        # Insert the text
         page.insert_text(
             point=(x, y),
             text=answer,
@@ -103,48 +82,63 @@ def fill_answers(pdf_path, output_path, answers):
             color=(0, 0, 0)
         )
     
-    # Save the modified PDF
     doc.save(output_path)
     doc.close()
 
 @app.post("/update_pdf/")
-async def submit_form(data:FormData):
+async def submit_form(data: FormData):
     answers = data.answers
-    pdf_path = 'forms/form.pdf'
+    # URL for the remote PDF on S3
+    pdf_url = "https://nursejoy.s3.ap-south-1.amazonaws.com/form.pdf"
+    
+    # Download the PDF from S3
+    response = requests.get(pdf_url)
+    if response.status_code != 200:
+        return {"error": "Failed to download PDF from S3."}
+    
+    # Save the downloaded PDF to a temporary file
+    temp_pdf_path = "temp_form.pdf"
+    with open(temp_pdf_path, "wb") as f:
+        f.write(response.content)
+    
     output_path = f"filled_pdfs/file_{int(time.time())}.pdf"
-    positions = find_answer_fields(pdf_path)
+    
+    # Ensure the output directory exists
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    
+    # Debug: print answer field positions
+    positions = find_answer_fields(temp_pdf_path)
     print("Found answer fields at:")
     for pos in positions:
         print(f"Page {pos['page']}: {pos['coordinates']}")
     
-    # Ensure the directories exist
-    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)  # Create 'forms' directory if it doesn't exist
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)  # Create 'filled_pdfs' directory if it doesn't exist
+    # Fill the answers into the PDF
+    fill_answers(temp_pdf_path, output_path, answers)
     
-    # Fill the answers
-    fill_answers(pdf_path, output_path, answers)
+    # Send emails with the filled PDF attached
     send_email('shankar1093@gmail.com', output_path)
     send_email('anthony.upton@gmail.com', output_path)
+    
+    # Delete the temporary files
     try:
         if os.path.exists(output_path):
             os.remove(output_path)
             print(f"Deleted file: {output_path}")
-        else:
-            print(f"File not found: {output_path}")
+        if os.path.exists(temp_pdf_path):
+            os.remove(temp_pdf_path)
+            print(f"Deleted file: {temp_pdf_path}")
     except Exception as e:
         print(f"Error deleting file: {e}")
-
-    return {"message": "PDF updated, emails sent, and file deleted."}
-
-
+    
+    return {"message": "PDF updated, emails sent, and temporary files deleted."}
 
 @app.get("/status/")
 async def get_status():
     return {
         "status": "healthy",
         "message": "All systems are operational.",
-        "timestamp": datetime.utcnow().isoformat() + "Z",  # Current UTC time in ISO format
-        "active_users": 0  # Placeholder for active users, update as needed
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "active_users": 0
     }
 
 @app.get("/")
