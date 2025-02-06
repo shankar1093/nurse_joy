@@ -2,6 +2,10 @@
 
 import { type CoreUserMessage, generateText } from 'ai';
 import { cookies } from 'next/headers';
+import { degrees, PDFDocument, rgb, StandardFonts,grayscale } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
+import { promises as fs } from 'fs';
+import path, { join } from 'path';
 
 import { customModel } from '@/lib/ai';
 import {
@@ -13,6 +17,7 @@ import {
 import type { VisibilityType } from '@/components/visibility-selector';
 import { get } from 'http';
 import getConfig from 'next/config';
+import { NextResponse } from 'next/server';
 
 export async function saveModelId(model: string) {
   const cookieStore = await cookies();
@@ -44,6 +49,25 @@ export async function deleteTrailingMessages({ id }: { id: string }) {
     chatId: message.chatId,
     timestamp: message.createdAt,
   });
+}
+
+export async function updatePDFForm(formAnswers: string[]) {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/update_pdf/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          answers: formAnswers
+        }),
+      });
+    } catch  (error) {
+        return NextResponse.json(
+          { error: 'Failed to process request' },
+          { status: 500 },
+        );
+    }
 }
 
 export async function updateChatVisibility({

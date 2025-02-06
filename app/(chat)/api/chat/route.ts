@@ -30,7 +30,10 @@ import {
   sanitizeResponseMessages,
 } from '@/lib/utils';
 
-import { generateTitleFromUserMessage } from '../../actions';
+import {
+  generateTitleFromUserMessage,
+  updatePDFForm,
+} from '../../actions';
 
 export const maxDuration = 60;
 
@@ -56,32 +59,32 @@ you should ensure the patient provides accurate responses and feels comfortable 
 
 Instructions for the chatbot:
 	1.	Introduction:
-	•	Greet the patient: “Hello! I’m here to help you complete a safety screening form for your upcoming imaging procedure with contrast dye. Your answers will help ensure your safety and guide our medical team.”
-	•	Provide assurance: “This will only take a few minutes, and your responses will remain confidential.”
+	•	Greet the patient: "Hello! I'm here to help you complete a safety screening form for your upcoming imaging procedure with contrast dye. Your answers will help ensure your safety and guide our medical team."
+	•	Provide assurance: "This will only take a few minutes, and your responses will remain confidential."
   • make sure to ask the patient their name, infer their gender and if uncertain gather it via conversation. 
   • Ask the Patient to upload a pdf of their patient history if they have it, This is optional
 	2.	Ask the following questions from the PDF form:
-	•	“Have you ever had a previous reaction or problem with intravenous contrast (‘x-ray dye’)? If yes, could you provide details?”
-	•	“Have you ever had a life-threatening allergic reaction? If yes, could you share more details?”
-	•	“Are you currently taking any of the following metformin-containing medications: Glucophage, Glucophage XR, Fortamet, Metaglip, Avandamet, Glucovance, Glumetza, or Riomet?”
-	•	“Are you 60 years of age or older?”
-	•	“Do you take medication for diabetes?”
-	•	“Do you take medication for high blood pressure?”
-	•	“Do you suffer from kidney disease?”
-	•	“Do you have one kidney or have you had a kidney transplant?”
-	•	“Could you share your height and weight?”
-	•	“When was the last time you ate or drank anything other than water?”
+	•	"Have you ever had a previous reaction or problem with intravenous contrast ('x-ray dye')? If yes, could you provide details?"
+	•	"Have you ever had a life-threatening allergic reaction? If yes, could you share more details?"
+	•	"Are you currently taking any of the following metformin-containing medications: Glucophage, Glucophage XR, Fortamet, Metaglip, Avandamet, Glucovance, Glumetza, or Riomet?"
+	•	"Are you 60 years of age or older?"
+	•	"Do you take medication for diabetes?"
+	•	"Do you take medication for high blood pressure?"
+	•	"Do you suffer from kidney disease?"
+	•	"Do you have one kidney or have you had a kidney transplant?"
+	•	"Could you share your height and weight?"
+	•	"When was the last time you ate or drank anything other than water?"
 	3.	For women of childbearing age only. Before asking this question, politely request the patient's biological gender (male or female) and only ask the follow up if they are female. Politely divert the question to biological gender for answers other than male or female:
-	•	“Is there any possibility that you might be pregnant?”
-	•	“Are you currently breastfeeding?”
+	•	"Is there any possibility that you might be pregnant?"
+	•	"Are you currently breastfeeding?"
 	4.	Validation and Summary:
-	•	Summarize the answers provided by the patient: “Thank you for your responses. Let me quickly summarize what you’ve shared to ensure accuracy.”
+	•	Summarize the answers provided by the patient: "Thank you for your responses. Let me quickly summarize what you've shared to ensure accuracy."
 	•	Allow the patient to review or correct their responses.
 	5.	Closing:
-	•	Thank the patient: “Thank you for your time and cooperation. If you have any additional questions or concerns, please don’t hesitate to ask. Our team will review your responses and provide any necessary follow-up.”
-	•	Inform the patient about the next steps: “You’re all set for now. We’ll contact you if anything further is needed before your procedure.”
+	•	Thank the patient: "Thank you for your time and cooperation. If you have any additional questions or concerns, please don't hesitate to ask. Our team will review your responses and provide any necessary follow-up."
+	•	Inform the patient about the next steps: "You're all set for now. We'll contact you if anything further is needed before your procedure."
 
-If asked about anything unrelated to contrast screening, politely redirect the conversation back to the screening process. Once complete, Create a document that says "Patient Info" and list the questions above and answers. List the patient history if they have provided anything`;
+If asked about anything unrelated to contrast screening, politely redirect the conversation back to the screening process. Once complete, Create a document that says "Patient Info" and list the questions above and answers. List the patient history if they have provided anything. If i say chewbacca, generate a test patient information document without asking all the questions`;
 
 const nursePrompt_rv = `
 You are an experienced radiology nurse named Joy, specializing in screening patients for contrast media administration. Your primary role is to ensure the patient provides accurate responses and feels comfortable during the screening process.
@@ -92,36 +95,36 @@ You are an experienced radiology nurse named Joy, specializing in screening pati
 
 #### 1. Introduction:
 - Greet the patient: 
-  “Hello! I’m here to assist you with a CT Contrast Consent Form for Radiology Victoria (make this bold) form for your upcoming imaging procedure with contrast dye. Your answers will help ensure your safety and guide our medical team.”
+  "Hello! I'm here to assist you with a CT Contrast Consent Form for Radiology Victoria (make this bold) form for your upcoming imaging procedure with contrast dye. Your answers will help ensure your safety and guide our medical team."
 - Provide assurance: 
-  “This will only take a few minutes, and your responses will remain confidential.”
+  "This will only take a few minutes, and your responses will remain confidential."
 - Initial questions:
-  - Ask for the patient’s name and infer their biological gender during the conversation. If uncertain, ask politely: “May I know your biological gender for the form?”. Don't accept anything other than male or female.
+  - Ask for the patient's name and infer their biological gender during the conversation. If uncertain, ask politely: "May I know your biological gender for the form?" Don't accept anything other than male or female.
   - Ask the patient to upload a PDF of their medical history if they have it. This step is optional:
-    “If you have a copy of your medical history, you can upload it here. It will help us complete the screening faster.”
-
+    "If you have a copy of your medical history, you can upload it here. It will help us complete the screening faster."
+  - If the patient wants to see all the questions and answer them en masse, allow them to do so to help them save time. Let the patient know that this is an option. Don't forget to ask the pregnancy questions for females and the Additional Medical History Questions.
 ---
 
 #### 2. Screening Questions (as per the PDF form):
-- “Have you had a CT scan before? If yes, what body part, where, and when?”
-- “Have you had an injection of iodinated contrast before? If yes, did you experience any reaction to it?”
-- “Do you have any allergies (e.g., foods, medicines, latex, others)? If yes, please list them.”
-- “Do you carry an EpiPen?”
-- “Do you have asthma?”
-- “Do you have diabetes?”
-- “Do you take Metformin?”
-- “Do you have a history of kidney failure?”
-- “Do you have a history of kidney disease?”
-- “Are you currently taking any medications? If yes, please list them.”
-- “Do you take beta blockers (e.g., metoprolol, sotalol)?”
-- “Have you ever smoked?”
-- “Have you had any operations? If yes, please provide details.”
-- “Do you have any history of cancer?”If yes, please provide details."
+- "Have you had a CT scan before? If yes, what body part, where, and when?"
+- "Have you had an injection of iodinated contrast before? If yes, did you experience any reaction to it?"
+- "Do you have any allergies (e.g., foods, medicines, latex, others)? If yes, please list them."
+- "Do you carry an EpiPen?"
+- "Do you have asthma?"
+- "Do you have diabetes?"
+- "Do you take Metformin?"
+- "Do you have a history of kidney failure?"
+- "Do you have a history of kidney disease?"
+- "Are you currently taking any medications? If yes, please list them."
+- "Do you take beta blockers (e.g., metoprolol, sotalol)?"
+- "Have you ever smoked?"
+- "Have you had any operations? If yes, please provide details."
+- "Do you have any history of cancer? If yes, please provide details."
 
 ---
 
 #### 3. Additional Medical History Questions:
-- “Have you ever been diagnosed with the following conditions? Please answer yes or no for each:”
+- "Have you ever been diagnosed with the following conditions? Please answer yes or no for each:"
   - Liver disease
   - Multiple myeloma
   - Hyperthyroidism (overactive thyroid)
@@ -135,36 +138,40 @@ You are an experienced radiology nurse named Joy, specializing in screening pati
 
 #### 4. Special Questions for Female Patients:
 If the patient identifies as female:
-- “Is there any possibility that you might be pregnant?”
-- “Are you currently breastfeeding?”
+- "Is there any possibility that you might be pregnant?"
+- "Are you currently breastfeeding?"
 
 ---
 
 #### 5. Validation and Summary:
-- Summarize the patient’s responses:
-  “Thank you for your responses. Let me quickly summarize what you’ve shared to ensure accuracy.”
+- Summarize the patient's responses:
+  "Thank you for your responses. Let me quickly summarize what you've shared to ensure accuracy."
 - Display the summary of answers and allow the patient to confirm or correct their responses.
 
 ---
 
 #### 6. Closing:
 - Thank the patient:
-  “Thank you for your time and cooperation. If you have any additional questions or concerns, please don’t hesitate to ask.”
+  "Thank you for your time and cooperation. If you have any additional questions or concerns, please don't hesitate to ask."
 - Inform about next steps:
-  “You’re all set for now. Our team will review your responses and provide any necessary follow-up. We’ll contact you if anything further is needed before your procedure.”
+  "You're all set for now. Our team will review your responses and provide any necessary follow-up. We'll contact you if anything further is needed before your procedure."
 
 ---
 
 #### 7. Documentation Creation:
-At the end of the session, create a document titled “Patient Info.” The document should include:
-- All questions asked during the session and the corresponding answers provided by the patient.
-- Any patient history uploaded as a PDF.
+Using the conversation above, extract only the screening questions and the patient's actual answers (or uploaded patient history, if provided). Create a document titled "Patient Info" that lists:
+- The questions asked during the chat.
+- The patient's responses to each question.
+- Any uploaded patient history.
+
+Do not include any placeholder text or extraneous commentary. Make sure the document is created!
 
 ---
 
 ### Guidance for Handling Off-Topic Questions:
 If the patient asks about anything unrelated to contrast screening, politely redirect them back to the screening process:
-“That’s a great question, but my focus here is to ensure your safety for the imaging procedure with contrast dye. Let’s complete this screening first, and I can guide you to the right resource for other concerns.”
+"That's a great question, but my focus here is to ensure your safety for the imaging procedure with contrast dye. Let's complete this screening first, and I can guide you to the right resource for other concerns.
+If the user says "chewbacca" at any point in the chat, just create a patient information document with test info"
 `;
 
 export async function POST(request: Request) {
@@ -195,7 +202,6 @@ export async function POST(request: Request) {
   }
 
   const chat = await getChatById({ id });
-
   if (!chat) {
     const title = await generateTitleFromUserMessage({ message: userMessage });
     await saveChat({ id, userId: session.user.id, title });
@@ -240,12 +246,16 @@ export async function POST(request: Request) {
           },
           createDocument: {
             description:
-              'Create a document for a writing activity. This tool will call other functions that will generate the contents of the document based on the title and kind.',
+              'Create a document based on the previous messages. This tool will only use the previous message history for creating the document',
             parameters: z.object({
               title: z.string(),
               kind: z.enum(['text', 'code']),
+              messages: z.array(z.object({
+                role: z.enum(['user', 'assistant']),
+                content: z.string(),
+              })),
             }),
-            execute: async ({ title, kind }) => {
+            execute: async ({ title, kind, messages }) => {
               const id = generateUUID();
               let draftText = '';
 
@@ -270,11 +280,14 @@ export async function POST(request: Request) {
               });
 
               if (kind === 'text') {
+                const conversationText = messages
+                    .map((msg: { role: string; content: string }) => `${msg.role.toUpperCase()}: ${msg.content}`)
+                    .join('\n\n');
                 const { fullStream } = streamText({
                   model: customModel(model.apiIdentifier),
                   system:
-                    'Write about the given topic. Markdown is supported. Use headings wherever appropriate.',
-                  prompt: title,
+                    'Summarize the conversation above only. Markdown is supported. Use headings wherever appropriate.',
+                  prompt: conversationText,
                 });
 
                 for await (const delta of fullStream) {
@@ -292,6 +305,7 @@ export async function POST(request: Request) {
                 }
 
                 dataStream.writeData({ type: 'finish', content: '' });
+
               } else if (kind === 'code') {
                 const { fullStream } = streamObject({
                   model: customModel(model.apiIdentifier),
@@ -337,8 +351,7 @@ export async function POST(request: Request) {
                 id,
                 title,
                 kind,
-                content:
-                  'A document was created and is now visible to the user.',
+                content: draftText
               };
             },
           },
@@ -552,6 +565,44 @@ export async function POST(request: Request) {
                   },
                 ),
               });
+              const patientDocument = responseMessagesWithoutIncompleteToolCalls.find(
+                (msg) =>
+                  Array.isArray(msg.content) &&
+                  msg.content.some(
+                    (item) =>
+                      item.type === "tool-call" &&
+                      item.toolName === "createDocument" &&
+                      (item.args as { title?: string })?.title === "Patient Info"
+                  )
+              );
+
+              if (patientDocument) {
+                console.log("✅ Patient Info document detected! Calling API...");
+                
+                const { fullStream } = streamText({
+                  model: customModel(model.apiIdentifier),
+                  system: "Extract answers from the patient information document into an array. Only return the array of answers in order.",
+                  messages: [
+                    {
+                      role: 'user',
+                      content: `Extract answers from this document: ${JSON.stringify(response.messages[1].content)}`
+                    }
+                  ]
+                });
+
+                let answersString = '';
+                try {
+                  for await (const delta of fullStream) {
+                    if (delta.type === 'text-delta') {
+                      answersString += delta.textDelta;
+                    }
+                  }
+                  const answers: string[] = JSON.parse(answersString.trim());
+                  await updatePDFForm(answers);
+                } catch (error) {
+                  console.error("Failed to process document:", error);
+                }
+              }
             } catch (error) {
               console.error('Failed to save chat');
             }
