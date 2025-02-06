@@ -43,7 +43,7 @@ def send_email(recipient: str, pdf_path: str):
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()  # Upgrade the connection to a secure encrypted SSL/TLS connection
-            server.login(username, password)  # Log in to the SMTP server
+            server.login(smtp_username, smtp_password)  # Log in to the SMTP server
             server.send_message(msg)  # Send the email
             print("Email sent successfully!")
     except Exception as e:
