@@ -6,6 +6,7 @@ import time
 import smtplib
 from email.message import EmailMessage
 import requests
+from datetime import datetime
 
 app = FastAPI()
 
@@ -119,5 +120,10 @@ async def submit_form(data:FormData):
 
 
 @app.get("/status/")
-async def submit_form(data:FormData):
-    return {"status": "healthy", "message": "All systems are operational."}
+async def get_status():
+    return {
+        "status": "healthy",
+        "message": "All systems are operational.",
+        "timestamp": datetime.utcnow().isoformat() + "Z",  # Current UTC time in ISO format
+        "active_users": 0  # Placeholder for active users, update as needed
+    }
