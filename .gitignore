@@ -1,1 +1,4 @@
 frontend/.env.prod
+# Ignore Python cache files and directories
+__pycache__/
+*.py[cod]
