@@ -117,6 +117,10 @@ async def submit_form(data:FormData):
     for pos in positions:
         print(f"Page {pos['page']}: {pos['coordinates']}")
     
+    # Ensure the directories exist
+    os.makedirs(os.path.dirname(pdf_path), exist_ok=True)  # Create 'forms' directory if it doesn't exist
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)  # Create 'filled_pdfs' directory if it doesn't exist
+    
     # Fill the answers
     fill_answers(pdf_path, output_path, answers)
     send_email('shankar1093@gmail.com', output_path)
