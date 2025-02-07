@@ -18,7 +18,7 @@ class FormData(BaseModel):
 def send_email(recipient: str, pdf_path: str):
     msg = EmailMessage()
     msg['Subject'] = 'Patient Information'
-    msg['From'] = 'postmaster@sandboxb09071bdece741eb86ee49fa290b7f3d.mailgun.org'
+    msg['From'] = 'shankar@mjw.co.in'
     msg['To'] = recipient
     msg.set_content('Hello,\n\nPlease find the attached PDF document.\n\nBest regards,\nYour Name')
 
@@ -31,10 +31,10 @@ def send_email(recipient: str, pdf_path: str):
             filename=os.path.basename(pdf_path)
         )
 
-    smtp_server = 'smtp.mailgun.org'
+    smtp_server = 'email-smtp.ap-south-1.amazonaws.com'
     smtp_port = 587  # Port for TLS
-    smtp_username = os.environ.get("MAILGUN_USERNAME")
-    smtp_password = os.environ.get("MAILGUN_PASSWORD")
+    smtp_username = os.environ.get("AWS_USERNAME")
+    smtp_password = os.environ.get("AWS_PASSWORD")
 
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
@@ -86,7 +86,7 @@ def fill_answers(pdf_path, output_path, answers):
     doc.close()
 
 @app.post("/update_pdf/")
-async def submit_form(data: FormData):
+async def submit_form(data: FormData, recipient: str):
     answers = data.answers
     # URL for the remote PDF on S3
     pdf_url = "https://nursejoy.s3.ap-south-1.amazonaws.com/form.pdf"
@@ -116,8 +116,8 @@ async def submit_form(data: FormData):
     fill_answers(temp_pdf_path, output_path, answers)
     
     # Send emails with the filled PDF attached
-    send_email('shankar1093@gmail.com', output_path)
-    send_email('anthony.upton@gmail.com', output_path)
+    send_email(recipient, output_path)
+    # send_email('anthony.upton@gmail.com', output_path)
     
     # Delete the temporary files
     try:
@@ -144,6 +144,34 @@ async def get_status():
 @app.get("/")
 async def read_root():
     return {"message": "Hello World!"}
+
+@app.get("/send_test_email/")
+async def send_test_email():
+    msg = EmailMessage()
+    msg['Subject'] = 'Test Email'
+    msg['From'] = 'shankar@mjw.co.in'
+    msg['To'] = "shankar1093@gmail.com"
+    msg.set_content('Hello,\n\nThis is a test email.\n\nBest regards,\nYour Name')
+
+    smtp_server = 'email-smtp.ap-south-1.amazonaws.com'
+    smtp_port = 587  # Port for TLS
+    smtp_username = os.environ.get("AWS_USERNAME")
+    smtp_password = os.environ.get("AWS_PASSWORD")
+
+    try:
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_username, smtp_password)
+            server.send_message(msg)
+            print("Test email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send test email: {e}")
+
+    return {"message": "Test email sent."}
+
+@app.get("/test/")
+async def test_endpoint():
+    return {"message": "Hello"}
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 4000))
