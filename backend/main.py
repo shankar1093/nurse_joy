@@ -14,6 +14,7 @@ app = FastAPI()
 
 class FormData(BaseModel):
     answers: List[str]
+    recipient: str
 
 def send_email(recipient: str, pdf_path: str):
     msg = EmailMessage()
@@ -86,8 +87,9 @@ def fill_answers(pdf_path, output_path, answers):
     doc.close()
 
 @app.post("/update_pdf/")
-async def submit_form(data: FormData, recipient: str):
+async def submit_form(data: FormData):
     answers = data.answers
+    recipient = data.recipient
     # URL for the remote PDF on S3
     pdf_url = "https://nursejoy.s3.ap-south-1.amazonaws.com/form.pdf"
     
