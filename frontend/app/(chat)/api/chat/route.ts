@@ -100,6 +100,7 @@ You are an experienced radiology nurse named Joy, specializing in screening pati
 	•	Option 1: Answer the questions one by one, which is the default approach.
 	•	Option 2: Receive and answer all the questions together if they prefer to answer them en masse to save time.
 	•	Remember to include the pregnancy-related questions for female patients and the Additional Medical History Questions, regardless of the chosen answering format.
+  * Always ask for summary
 ---
 
 #### 2. Screening Questions (as per the PDF form):
@@ -598,9 +599,13 @@ export async function POST(request: Request) {
                     }
                   }
                   const answers: string[] = JSON.parse(answersString.trim());
-                  if (email === "shankar1093@gmail.com" || email === "anthony.upton@gmail.com") {
+                  if (email) {
+                    console.log(email)
                     await updatePDFForm(answers, email);
+                  } else {
+                    console.error("Email is undefined or null");
                   }
+       
                 } catch (error) {
                   console.error("Failed to process document:", error);
                 }

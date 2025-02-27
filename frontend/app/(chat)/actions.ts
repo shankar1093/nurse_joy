@@ -65,6 +65,7 @@ export async function updatePDFForm(formAnswers: string[], userEmail: string) {
           recipient: userEmail
         }),
       });
+      console.log(response)
     } catch  (error) {
         return NextResponse.json(
           { error: 'Failed to process request' },
