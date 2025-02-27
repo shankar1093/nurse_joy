@@ -53,18 +53,22 @@ export async function deleteTrailingMessages({ id }: { id: string }) {
 
 export async function updatePDFForm(formAnswers: string[], userEmail: string) {
   try {
-    const response = await fetch(process.env.NODE_ENV === 'development' 
-        ? "http://localhost:8000/update_pdf/" 
-        : "https://nurse-joy-backend.onrender.com/update_pdf/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          answers: formAnswers,
-          recipient: userEmail
-        }),
-      });
+    const url = process.env.NODE_ENV === 'development' 
+      ? "http://localhost:8000/update_pdf/" 
+      : "https://nurse-joy-backend.onrender.com/update_pdf/";
+    
+    console.log('Making POST request to:', url);
+    
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        answers: formAnswers,
+        recipient: userEmail
+      }),
+    });
       console.log(response)
     } catch  (error) {
         return NextResponse.json(
